@@ -8,17 +8,22 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.pnpc.rmd.model.Model;
+import com.pnpc.rmd.model.WeatherVO;
+import com.pnpc.rmd.service.RequestWeatherVolley;
+import com.squareup.otto.Subscribe;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-                                                               GoogleApiClient.OnConnectionFailedListener,
-        LocationListener{
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
 
     private GoogleApiClient mGoogleApiClient;
+    private WeatherVO weatherVO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +36,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     .addOnConnectionFailedListener(this)
                     .build();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        EventBusUtility.getInstance().unregister(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EventBusUtility.getInstance().register(this);
     }
 
     protected void onStart() {
@@ -55,12 +72,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onConnected(Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             setDefaultLatLong();
-        }
-        else {
-            Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            Model.getInstance().setLocation(location);
+        } else {
             LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000, 10, this);
+            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0, 0, this);
+
+
         }
     }
 
@@ -75,23 +91,35 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 
+
     @Override
     public void onLocationChanged(Location location) {
         Model.getInstance().setLocation(location);
+        new RequestWeatherVolley(this, Model.getInstance().getLocation());
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
+        Log.d("debug", "debug");
     }
 
     @Override
     public void onProviderEnabled(String provider) {
+        Log.d("debug", "debug");
 
     }
 
     @Override
     public void onProviderDisabled(String provider) {
+        Log.d("debug", "debug");
 
     }
+
+    @Subscribe
+    public void onRequestReturned(WeatherDataUpdateEvent event){
+        weatherVO = Model.getInstance().getWeather();
+        Log.d("debug", "debug");
+
+    }
+
 }

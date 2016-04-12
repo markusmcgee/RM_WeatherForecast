@@ -7,10 +7,14 @@ import com.squareup.otto.Bus;
  */
 public final class EventBusUtility {
 
-    private static EventBusUtility instance = null;
+    private static Bus instance = null;
     private EventBusUtility() { }
-    public static Bus getInstance() {
-        return new Bus();
+    public static synchronized Bus getInstance() {
+        if (instance == null) {
+            instance = new Bus();
+        }
+        return instance;
     }
+
 
 }
