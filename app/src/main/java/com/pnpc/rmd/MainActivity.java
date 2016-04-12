@@ -75,8 +75,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         } else {
             LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0, 0, this);
-
-
         }
     }
 
@@ -89,8 +87,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onConnectionFailed(ConnectionResult connectionResult) {
         setDefaultLatLong();
     }
-
-
 
     @Override
     public void onLocationChanged(Location location) {
@@ -106,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onProviderEnabled(String provider) {
         Log.d("debug", "debug");
-
     }
 
     @Override
@@ -119,7 +114,5 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onRequestReturned(WeatherDataUpdateEvent event){
         weatherVO = Model.getInstance().getWeather();
         Log.d("debug", "debug");
-
     }
-
 }

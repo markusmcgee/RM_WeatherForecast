@@ -22,7 +22,7 @@ import org.json.JSONObject;
 /**
  * Created by markusmcgee on 4/12/16.
  */
-public class RequestWeatherVolley extends Volley {
+public class RequestWeatherVolley {
 
     Location location;
     Context context;
