@@ -3,4 +3,5 @@
     <string name="forcast_weather_gov_url">http://forecast.weather.gov/MapClick.php?lat=LATITUDE&amp;lon=LONGITUDE&amp;FcstType=json</string>
     <string name="default_latitude">41.885575</string>
     <string name="default_longitude">-87.644408</string>
+    <string name="hello_world">Hello World</string>
 </resources>

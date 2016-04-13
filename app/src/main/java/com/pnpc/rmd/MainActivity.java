@@ -7,8 +7,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -20,15 +25,35 @@ import com.squareup.otto.Subscribe;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener, View.OnClickListener {
+
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     private GoogleApiClient mGoogleApiClient;
     private WeatherVO weatherVO;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.weather_forecast_recycler);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        setDefaultLatLong();
+        new RequestWeatherVolley(this, Model.getInstance().getLocation());
+
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addApi(LocationServices.API)
@@ -111,8 +136,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     @Subscribe
-    public void onRequestReturned(WeatherDataUpdateEvent event){
+    public void onRequestReturned(WeatherDataUpdateEvent event) {
         weatherVO = Model.getInstance().getWeather();
+        mAdapter = new WeatherForecastRecyclerAdapter(weatherVO.getData());
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.getAdapter().notifyDataSetChanged();
+
         Log.d("debug", "debug");
+    }
+
+    @Override
+    public void onClick(View v) {
+
+
     }
 }

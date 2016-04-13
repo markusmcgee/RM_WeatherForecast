@@ -12,7 +12,8 @@ public final class Model {
     private double lng;
     private double lat;
 
-    private Model() { }
+    private Model() {
+    }
 
     public static synchronized Model getInstance() {
         if (instance == null) {
@@ -24,11 +25,18 @@ public final class Model {
     public WeatherVO getWeather() {
         return weather;
     }
+
     public void setWeather(WeatherVO weather) {
         this.weather = weather;
     }
 
     public Location getLocation() {
+        if (location == null) {
+            location = new Location("");//provider name is unecessary
+            location.setLatitude(getLatitude());//your coords of course
+            location.setLongitude(getLongitude());
+
+        }
         return location;
     }
 
