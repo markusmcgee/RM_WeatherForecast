@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.getAdapter().notifyDataSetChanged();
 
-        Toast.makeText(this,"Location Updated",Toast.LENGTH_SHORT);
+        Toast.makeText(this,"Location Updated",Toast.LENGTH_SHORT).show();
 
     }
 
