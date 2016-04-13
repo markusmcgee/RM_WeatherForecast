@@ -31,6 +31,11 @@ public class WeatherForecastRecyclerAdapter extends RecyclerView.Adapter<Weather
         }
     }
 
+    protected void setData(DataVO data){
+        this.data = data;
+        notifyDataSetChanged();
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
