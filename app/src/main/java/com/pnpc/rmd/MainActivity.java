@@ -7,13 +7,11 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -48,7 +46,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
+        //Make views scroll horizontally.
+        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         setDefaultLatLong();
@@ -121,28 +120,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.d("debug", "debug");
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-        Log.d("debug", "debug");
+
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        Log.d("debug", "debug");
 
     }
 
     @Subscribe
     public void onRequestReturned(WeatherDataUpdateEvent event) {
         weatherVO = Model.getInstance().getWeather();
-        mAdapter = new WeatherForecastRecyclerAdapter(weatherVO.getData());
+        mAdapter = new WeatherForecastRecyclerAdapter(weatherVO);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.getAdapter().notifyDataSetChanged();
 
-        Log.d("debug", "debug");
+        Toast.makeText(this,"Location Updated",Toast.LENGTH_SHORT);
+
     }
 
     @Override
