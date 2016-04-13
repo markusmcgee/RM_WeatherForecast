@@ -28,12 +28,16 @@ public class WeatherForecastRecyclerAdapter extends RecyclerView.Adapter<Weather
 
         public TextView dayOfWeekText;
         public TextView forecastText;
+        public TextView forecastDescriptionText;
         public TextView temperatureText;
+        public TextView temperatureLabel;
         public ViewHolder(View v) {
             super(v);
             dayOfWeekText = (TextView) v.findViewById(R.id.day_of_week);
             forecastText = (TextView) v.findViewById(R.id.forecast);
+            forecastDescriptionText = (TextView) v.findViewById(R.id.forecast_description);
             temperatureText = (TextView) v.findViewById(R.id.temperature);
+            temperatureLabel = (TextView) v.findViewById(R.id.temperature_label);
         }
     }
 
@@ -59,6 +63,8 @@ public class WeatherForecastRecyclerAdapter extends RecyclerView.Adapter<Weather
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.dayOfWeekText.setText(data.getTime().getStartPeriodName().get(position).toString());
         holder.forecastText.setText(data.getData().getWeather().get(position).toString());
+        holder.forecastDescriptionText.setText(data.getData().getText().get(position).toString());
+        holder.temperatureLabel.setText(data.getTime().getTempLabel().get(position).toString());
         holder.temperatureText.setText(data.getData().getTemperature().get(position).toString());
     }
 
