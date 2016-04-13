@@ -10,7 +10,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -23,7 +22,7 @@ import com.squareup.otto.Subscribe;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, View.OnClickListener {
+        LocationListener{
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -38,20 +37,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Recycler used to display views
         mRecyclerView = (RecyclerView) findViewById(R.id.weather_forecast_recycler);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
+        //Since API is returning current weather as well as the next few days
+        //fixed size set to false.
+        mRecyclerView.setHasFixedSize(false);
 
-        // use a linear layout manager
-        //Make views scroll horizontally.
+        //Enable Horizontal swipe and let Android do all the work for swiping.
         mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        //Set the default lat long from our string resources.
         setDefaultLatLong();
+
+        //Request weather data using class containing Volley.
+        //Location held in Model singleton.
         new RequestWeatherVolley(this, Model.getInstance().getLocation());
 
+        //Start pinging Location services on device.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addApi(LocationServices.API)
@@ -64,25 +68,32 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onPause() {
         super.onPause();
+        //Otto event bus used to get notification on when service has updated model.
+        //Unregister to prevent memory leaks.  App going to background.
         EventBusUtility.getInstance().unregister(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        //Otto event bus used to get notification on when service has updated model.
+        //Register event bus when app comes to foreground.
         EventBusUtility.getInstance().register(this);
     }
 
     protected void onStart() {
+        //When application starts try to connection to location services defined in onCreate.
         mGoogleApiClient.connect();
         super.onStart();
     }
 
     protected void onStop() {
+        //When application stops disconnect from location services.  Try to save battery.
         mGoogleApiClient.disconnect();
         super.onStop();
     }
 
+    //Get default lat long from string.xml
     private void setDefaultLatLong() {
         double lat_point = Double.parseDouble(getString(R.string.default_latitude));
         double lng_point = Double.parseDouble(getString(R.string.default_longitude));
@@ -93,8 +104,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
+
+        //Once connected to location service check to see if we have permission to use location service and
+        //pull location passively every 10 seconds with a check for location change of 5 meters.
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            //If we do not have access then pull default lat long.
             setDefaultLatLong();
+
         } else {
             LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 10000, 5, this);
@@ -131,20 +148,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
+    //When event is dispatched from Otto it is caught here in the main and only running Activity.
     @Subscribe
     public void onRequestReturned(WeatherDataUpdateEvent event) {
         weatherVO = Model.getInstance().getWeather();
+
+        //request new weather forecast recycler adapter
         mAdapter = new WeatherForecastRecyclerAdapter(weatherVO);
         mRecyclerView.setAdapter(mAdapter);
+
+        //NotifiyDataSetChanged will let recycler now it has new data and should update itself when it has a chance too.
         mRecyclerView.getAdapter().notifyDataSetChanged();
 
+        //Toast to see if it's actually updating.
         Toast.makeText(this,"Location Updated",Toast.LENGTH_SHORT).show();
 
     }
 
-    @Override
-    public void onClick(View v) {
-
-
-    }
 }

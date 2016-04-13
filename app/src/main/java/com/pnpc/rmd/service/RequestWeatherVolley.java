@@ -21,20 +21,27 @@ import org.json.JSONObject;
 
 /**
  * Created by markusmcgee on 4/12/16.
+ *
+ * Standard Java class that executes a Volley service request.
+ *
  */
 public class RequestWeatherVolley {
 
-    Location location;
-    Context context;
+    private Location location;
+    private Context context;
 
-    WeatherVO weather;
+    private WeatherVO weather;
 
+    //Constuctor receives current context, location and makes the call.
     public RequestWeatherVolley(Context context, Location location) {
         this.location = location;
         this.context = context;
         makeRequest();
     }
 
+    //function places Volley request into RequestQueue.
+    //Volley will send Otto event notification when done in event though RequestWeatherVolley maybe GC.
+    //Volley designed to work in background with minimal code as shown below.
     private void makeRequest() {
         String weather_url;
         weather_url = context.getString(R.string.forcast_weather_gov_url);
@@ -45,7 +52,7 @@ public class RequestWeatherVolley {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, weather_url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.d("debug", response.toString());
+                Log.d("json", response.toString());
                     weather = new Gson().fromJson(response.toString(), WeatherVO.class);
                     Model.getInstance().setWeather(weather);
                     EventBusUtility.getInstance().post(new WeatherDataUpdateEvent());

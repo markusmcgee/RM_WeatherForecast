@@ -10,6 +10,11 @@ import com.pnpc.rmd.model.WeatherVO;
 
 /**
  * Created by markusmcgee on 4/12/16.
+ *
+ * Basic RecyclerAdapter.
+ *
+ *
+ *
  */
 public class WeatherForecastRecyclerAdapter extends RecyclerView.Adapter<WeatherForecastRecyclerAdapter.ViewHolder> {
 
